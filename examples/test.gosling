@@ -1,0 +1,45 @@
+
+
+struct Vector2 {
+	pub x: f32
+	pub y: f32
+}
+
+impl Vector2 {
+}
+
+fun main(argc: usize, argv: ref[ref[char]]): i32  {
+	let n = deref 0 
+
+	let c_array: ref i32 = 0 as f32
+
+	let safe_array: List<i32>
+
+	let a: List<i32> = arr::from(c_array);
+
+	for i: i32 in argv {
+	}
+
+	while n < 100 {
+		n += 1
+
+
+		let fizz = n % 3 == 0 
+		let buzz = n % 5 == 0
+
+		unless fizz || buzz {
+			print!("{n}")
+		} else {
+			if fizz {
+				print!("Fizz")
+			}
+			if buzz {
+				print!("Buzz")
+			}
+		}
+
+		print!("\n")
+	}
+
+}
+

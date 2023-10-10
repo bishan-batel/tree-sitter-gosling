@@ -1,0 +1,100 @@
+module.exports = grammar({
+  name: "gosling",
+  extras: ($) => [/\s|\\\r?\n/, $.comment],
+  inline: ($) => [
+    $._expression,
+    $._statement,
+    $.function_definition,
+    $._bin_expr,
+  ],
+  word: ($) => $.identifier,
+
+  rules: {
+    source_file: ($) => repeat($._top_level),
+    // source_file: ($) => repeat($.import),
+    _top_level: ($) =>
+      choice(seq(optional($.visibility), choice($.function_definition))),
+
+    visibility: ($) => choice("export"),
+
+    function_definition: ($) =>
+      seq(
+        "fun",
+        $.function_def_name,
+        "(",
+        ")",
+        optional(seq(":", $.type)),
+        $.function_scope
+      ),
+
+    function_def_name: ($) => $.identifier,
+
+    function_scope: ($) => seq("{", repeat($._statement), "}"),
+
+    _statement: ($) =>
+      choice($.variable, $.bool, $.number, $.string, $._bin_expr),
+    _bin_expr: ($) => (4,seq($._statement, $.bin_operator, $._statement)),
+    variable: ($) => $.identifier,
+
+    type: ($) => $.identifier,
+
+    identifier: ($) => /[A-Za-z][A-Za-z0-9_]*/,
+    number: ($) => /[0-9]+\.?[0-9]*f?/,
+    bool: ($) => prec(10, choice("true", "false")),
+    string: ($) => seq('"', token(/[^"]+/), '"'),
+    bin_operator: ($) =>
+      choice(
+        "!",
+        "%",
+        "^",
+        "&",
+        "*",
+        "-",
+        "+",
+        "*",
+        "/",
+        ">",
+        "<",
+        "|",
+        "||",
+        "=",
+        "!=",
+        "%=",
+        "^=",
+        "&=",
+        "*=",
+        "-=",
+        "+=",
+        "*=",
+        "/=",
+        ">=",
+        "<=",
+        "|=",
+        "=="
+      ),
+
+    comment: (_) =>
+      token(
+        choice(
+          seq("//", /(\\+(.|\r?\n)|[^\\\n])*/),
+          seq("/*", /[^*]*\*+([^/*][^*]*\*+)*/, "/")
+        )
+      ),
+  },
+});
+
+function sep(rule, separator) {
+  return optional(sep1(rule, separator));
+}
+
+function sep1(rule, separator) {
+  return seq(rule, repeat(seq(separator, rule)));
+}
+
+function commaSep1(rule) {
+  return sep1(rule, ",");
+}
+
+function commaSep(rule) {
+  return optional(commaSep1(rule));
+}
